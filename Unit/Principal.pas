@@ -357,7 +357,7 @@ end;
 
 procedure TfrPrincipal.chkBancoMaisClick(Sender: TObject);
 begin
-  if chkBancoMais.Enabled then
+  if chkBancoMais.Checked then
   begin
     ConectarBaseDados;
     cbEmpresa.Enabled := True;
