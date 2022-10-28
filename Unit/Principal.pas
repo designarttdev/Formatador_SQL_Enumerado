@@ -406,12 +406,15 @@ begin
         vQuery.Connection := AdcBaseDados;
         vQuery.Close;
         vQuery.Sql.Clear;
-        vQuery.sql.Text := 'SELECT E.CODIGOEMPRESA, E.ALIAS, E.NOMEEMPRESA FROM DGLOB000 E';
+        vQuery.sql.Text := 'SELECT E.CODIGOEMPRESA, E.ALIAS, E.NOMEEMPRESA FROM DGLOB000 E ORDER BY E.CODIGOEMPRESA';
         vQuery.open;
         vQuery.First;
 
         for I := 0 to vQuery.RecordCount - 1 do
+        begin
           cbEmpresa.Items.Add(Trim(vQuery.FieldByName('CODIGOEMPRESA').AsInteger.ToString + ' - ' + vQuery.FieldByName('NOMEEMPRESA').AsString));
+          vQuery.Next;
+        end;
 
         cbEmpresa.Enabled := True;
 
