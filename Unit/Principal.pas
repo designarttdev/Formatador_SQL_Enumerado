@@ -359,6 +359,7 @@ procedure TfrPrincipal.chkBancoMaisClick(Sender: TObject);
 begin
   if chkBancoMais.Checked then
   begin
+    cbEmpresa.Clear;
     ConectarBaseDados;
     cbEmpresa.Enabled := True;
     cbEmpresa.ItemIndex := 0;
