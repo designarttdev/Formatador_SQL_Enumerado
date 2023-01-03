@@ -283,14 +283,14 @@ begin
   begin
     cbEmpresa.Clear;
     ConectarBaseDados;
-    cbEmpresa.Enabled := True;
+    cbEmpresa.Enabled   := True;
     cbEmpresa.ItemIndex := 0;
     cbEmpresaChange(nil);
   end
   else
   begin
-    cbEmpresa.Enabled   := False;
-    cbEmpresa.ItemIndex := -1;
+    cbEmpresa.Enabled      := False;
+    cbEmpresa.ItemIndex    := -1;
     AdcBaseDados.Connected := False;
   end;
 end;
@@ -306,17 +306,19 @@ var
   aIni : TIniFile;
   I : Integer;
 begin
-  try
-    aIni := TIniFile.Create(ExtractFilePath(Application.ExeName) + '\acessobanco.ini');
-    vUserName := Trim(aIni.ReadString('ACESSO', 'usuario', ''));
-    vPassword := Trim(aIni.ReadString('ACESSO', 'password', ''));
-  finally
-    aIni.Free;
-  end;
+//  try
+//    aIni := TIniFile.Create(ExtractFilePath(Application.ExeName) + '\acessobanco.ini');
+//    vUserName := Trim(aIni.ReadString('ACESSO', 'usuario', ''));
+//    vPassword := Trim(aIni.ReadString('ACESSO', 'password', ''));
+//  finally
+//    aIni.Free;
+//  end;
 
   try
     aIni := TIniFile.Create(ExtractFileDrive(Application.ExeName) + '\Sge32\alias.ini');
     vBaseDados := Trim(aIni.ReadString('BASEDADOS', 'database', ''));
+    vUserName  := 'SYSDBA';
+    vPassword  := Trim(aIni.ReadString('BASEDADOS', 'senha', ''));
     if vBaseDados <> '' then
     begin
       try
