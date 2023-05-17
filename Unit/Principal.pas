@@ -39,6 +39,8 @@ type
     vUserName, vPassword : String;
     procedure ConectarBaseDados;
     function RetornaTipoCampo(vNomeCampo: String): String;
+    function ApenasNumeros(pStr: String): String;
+    function RetornaAliasEmpresa(vCodigoEmpresa: String): String;
     { Private declarations }
   public
     { Public declarations }
@@ -152,7 +154,6 @@ Function TfrPrincipal.RetornaTipoCampo(vNomeCampo : String) : String;
 var
   vQueryBanco : TFDQuery;
 begin
-
   Result := '';
   try
 
@@ -234,6 +235,39 @@ begin
   end;
 end;
 
+function TfrPrincipal.RetornaAliasEmpresa(vCodigoEmpresa : String) : String;
+var
+  vQueryAux : TFDQuery;
+begin
+  vQueryAux := TFDQuery.Create(nil);
+  vQuery.Connection := AdcBaseDados;
+  try
+    vQuery.Close;
+    vQuery.SQL.Clear;
+    vQuery.SQL.Add('SELECT E.CODIGOEMPRESA, E.ALIAS, E.NOMEEMPRESA FROM DGLOB000 E');
+    vQuery.SQL.Add('WHERE E.CODIGOEMPRESA = :CODIGOEMPRESA;');
+
+    vQuery.ParamByName('CODIGOEMPRESA').AsInteger := StrToInt(vCodigoEmpresa);
+    vQuery.Open;
+    vQuery.FetchAll;
+    vQuery.First;
+
+    Result := vQuery.FieldByName('ALIAS').AsString;
+  finally
+    FreeAndNil(vQueryAux);
+  end;
+end;
+
+function TFrPrincipal.ApenasNumeros(pStr : String) : String;
+var i: Integer;
+begin
+  Result := '';
+
+  for I := 1 to Length(pStr) do
+    if pStr[i] in ['1','2','3','4','5','6','7','8','9','0'] then
+      Result := Result + pStr[i];
+end;
+
 procedure TfrPrincipal.cbEmpresaChange(Sender: TObject);
 var
   aIni : TIniFile;
@@ -241,8 +275,10 @@ var
   vAlias,vCodigoEmpStr : String;
 begin
 
-  vAlias := 'EMPRESA' + FormatFloat('000', StrToFloat(Copy(cbEmpresa.Text, 1, pos(' ', cbEmpresa.Text))));
+//  vAlias := 'EMPRESA' + FormatFloat('000', StrToFloat(Copy(cbEmpresa.Text, 1, pos(' ', cbEmpresa.Text))));
   vCodigoEmpStr := Copy(cbEmpresa.Text, 1, pos(' ', cbEmpresa.Text));
+
+  vAlias := RetornaAliasEmpresa(ApenasNumeros(vCodigoEmpStr));
 
   if AdcBaseDados.Connected then
   begin
@@ -252,10 +288,15 @@ begin
       if vEmpresa <> '' then
       begin
         try
-          AdcEmpresa.Connected       := False;
-          AdcEmpresa.Params.UserName := vUserName;
-          AdcEmpresa.Params.Password := vPassword;
-          AdcEmpresa.Params.Database := vEmpresa;
+          AdcEmpresa.Connected                 := False;
+          AdcEmpresa.Params.UserName           := vUserName;
+          AdcEmpresa.Params.Values['Protocol'] := 'TCPIP';
+          AdcEmpresa.Params.Values['Port']     := aIni.ReadString(vAlias, 'porta', '');
+          AdcEmpresa.Params.Values['Server']   := aIni.ReadString(vAlias, 'hostname', EmptyStr);
+          if AdcEmpresa.Params.Values['Server'] = '' then
+            AdcEmpresa.Params.Values['Server'] := '127.0.0.1';
+            AdcEmpresa.Params.Password := vPassword;
+          AdcEmpresa.Params.Database := vBaseDados;
           AdcEmpresa.Connected       := True;
 
           CodigoEmpresa := StrToInt(Trim(vCodigoEmpStr));
@@ -281,7 +322,6 @@ procedure TfrPrincipal.chkBancoMaisClick(Sender: TObject);
 begin
   if chkBancoMais.Checked then
   begin
-    cbEmpresa.Clear;
     ConectarBaseDados;
     cbEmpresa.Enabled   := True;
     cbEmpresa.ItemIndex := 0;
@@ -292,6 +332,7 @@ begin
     cbEmpresa.Enabled      := False;
     cbEmpresa.ItemIndex    := -1;
     AdcBaseDados.Connected := False;
+    cbEmpresa.Clear;
   end;
 end;
 
@@ -316,28 +357,36 @@ begin
 
   try
     aIni := TIniFile.Create(ExtractFileDrive(Application.ExeName) + '\Sge32\alias.ini');
-    vBaseDados := Trim(aIni.ReadString('BASEDADOS', 'database', ''));
+    vBaseDados := Trim(aIni.ReadString('BASEDADOS', 'database', EmptyStr));
     vUserName  := 'SYSDBA';
     vPassword  := Trim(aIni.ReadString('BASEDADOS', 'senha', ''));
     if vBaseDados <> '' then
     begin
       try
-        AdcBaseDados.Connected       := False;
-        AdcBaseDados.Params.UserName := vUserName;
-        AdcBaseDados.Params.Password := vPassword;
+        AdcBaseDados.Connected                 := False;
+        AdcBaseDados.Params.UserName           := vUserName;
+        AdcBaseDados.Params.Values['Protocol'] := 'TCPIP';
+        AdcBaseDados.Params.Values['Port']     := aIni.ReadString('BASEDADOS', 'porta', '');
+        AdcBaseDados.Params.Values['Server']   := aIni.ReadString('BASEDADOS', 'hostname', EmptyStr);
+        if AdcBaseDados.Params.Values['Server'] = '' then
+          AdcBaseDados.Params.Values['Server'] := '127.0.0.1';
+          AdcBaseDados.Params.Password := vPassword;
         AdcBaseDados.Params.Database := vBaseDados;
         AdcBaseDados.Connected       := True;
 
         vQuery.Connection := AdcBaseDados;
         vQuery.Close;
         vQuery.Sql.Clear;
-        vQuery.sql.Text := 'SELECT E.CODIGOEMPRESA, E.ALIAS, E.NOMEEMPRESA FROM DGLOB000 E ORDER BY E.CODIGOEMPRESA';
+        vQuery.sql.Text := 'SELECT E.CODIGOEMPRESA, E.ALIAS, E.NOMEEMPRESA FROM DGLOB000 E';
         vQuery.open;
         vQuery.First;
 
         for I := 0 to vQuery.RecordCount - 1 do
         begin
-          cbEmpresa.Items.Add(Trim(vQuery.FieldByName('CODIGOEMPRESA').AsInteger.ToString + ' - ' + vQuery.FieldByName('NOMEEMPRESA').AsString));
+          if Trim(aIni.ReadString(vQuery.FieldByName('ALIAS').AsString, 'database', EmptyStr)) <> '' then
+          begin
+            cbEmpresa.Items.Add(Trim(vQuery.FieldByName('CODIGOEMPRESA').AsInteger.ToString + ' - ' + vQuery.FieldByName('NOMEEMPRESA').AsString));
+          end;
           vQuery.Next;
         end;
 
@@ -348,7 +397,7 @@ begin
           Application.MessageBox('Erro ao conectar no BaseDados!',
             'Atenção!', MB_OK + MB_ICONSTOP);
           cbEmpresa.ItemIndex := -1;
-          CodigoEmpresa := -1;
+          CodigoEmpresa       := -1;
           Exit;
         end;
       end;
