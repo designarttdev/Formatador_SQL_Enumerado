@@ -9,7 +9,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.Phys.IB, FireDAC.Phys.IBDef, FireDAC.VCLUI.Wait,
   Data.DB, FireDAC.Comp.Client, FireDAC.Stan.Param, FireDAC.DatS,
-  FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet;
+  FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, System.RegularExpressions;
 
 type
   TfrPrincipal = class(TForm)
@@ -164,9 +164,21 @@ begin
       vAux := Trim(vAux.Replace('WHERE', sLineBreak + ' WHERE ')); // Faz quebra de linha no where
       vAux := Trim(vAux.Replace('FROM ', sLineBreak + ' FROM ')); // Faz quebra de linha no FROM
       vAux := Trim(vAux.Replace('AND', sLineBreak + ' AND ')); // Faz quebra de linha no AND
+
+      //      vAux := TRegEx.Replace(vAux, '(?<!INNER\s)(?<!LEFT\s)(?<!RIGHT\s)\bJOIN\b', sLineBreak + ' JOIN ');
+      vAux := Trim(vAux.Replace('JOIN ', sLineBreak + ' JOIN '));
       vAux := Trim(vAux.Replace('INNER JOIN ', sLineBreak + ' INNER JOIN ')); // Faz quebra de linha no INNER JOIN
       vAux := Trim(vAux.Replace('LEFT JOIN ', sLineBreak + ' LEFT JOIN ')); // Faz quebra de linha no LEFT JOIN
       vAux := Trim(vAux.Replace('RIGHT JOIN ', sLineBreak + ' RIGHT JOIN ')); // Faz quebra de linha no RIGHT JOIN
+
+      vAux := Trim(vAux.Replace('INNER' + #$D#$A + ' JOIN ', sLineBreak + ' INNER JOIN ')); // Faz quebra de linha no INNER JOIN
+      vAux := Trim(vAux.Replace('LEFT' + #$D#$A + ' JOIN ', sLineBreak + ' LEFT JOIN ')); // Faz quebra de linha no LEFT JOIN
+      vAux := Trim(vAux.Replace('RIGHT' + #$D#$A + ' JOIN ', sLineBreak + ' RIGHT JOIN ')); // Faz quebra de linha no RIGHT JOIN
+
+      vAux := Trim(vAux.Replace('INNER ' + #$D#$A + ' JOIN ', sLineBreak + ' INNER JOIN ')); // Faz quebra de linha no INNER JOIN
+      vAux := Trim(vAux.Replace('LEFT ' + #$D#$A + ' JOIN ', sLineBreak + ' LEFT JOIN ')); // Faz quebra de linha no LEFT JOIN
+      vAux := Trim(vAux.Replace('RIGHT ' + #$D#$A + ' JOIN ', sLineBreak + ' RIGHT JOIN ')); // Faz quebra de linha no RIGHT JOIN
+
       vAux := Trim(vAux.Replace('CASE', ' CASE ' + sLineBreak));  // Insere Enter depois do CASE
       vAux := Trim(vAux.Replace('WHEN', ' WHEN '+ sLineBreak));  // Insere Enter depois do WHEN
       vAux := Trim(vAux.Replace('ELSE', ' ELSE '+ sLineBreak));  // Insere Enter depois do ELSE

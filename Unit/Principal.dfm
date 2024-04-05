@@ -21,15 +21,16 @@ object frPrincipal: TfrPrincipal
     Left = 0
     Top = 0
     Width = 794
-    Height = 468
+    Height = 492
     Align = alClient
     TabOrder = 0
+    ExplicitHeight = 468
     object Memo1: TMemo
       AlignWithMargins = True
       Left = 11
       Top = 11
       Width = 380
-      Height = 446
+      Height = 470
       Margins.Left = 10
       Margins.Top = 10
       Margins.Right = 10
@@ -38,14 +39,13 @@ object frPrincipal: TfrPrincipal
       CharCase = ecUpperCase
       ScrollBars = ssVertical
       TabOrder = 0
-      WordWrap = False
     end
     object Memo2: TMemo
       AlignWithMargins = True
       Left = 403
       Top = 11
       Width = 380
-      Height = 446
+      Height = 470
       Margins.Left = 10
       Margins.Top = 10
       Margins.Right = 10
@@ -56,20 +56,22 @@ object frPrincipal: TfrPrincipal
       ScrollBars = ssVertical
       TabOrder = 1
       WordWrap = False
+      ExplicitHeight = 446
     end
   end
   object pnlFooter: TPanel
     Left = 0
-    Top = 468
+    Top = 492
     Width = 794
-    Height = 71
+    Height = 47
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 486
     object btnRemoverFormatacao: TButton
       Left = 403
       Top = 1
       Width = 390
-      Height = 69
+      Height = 45
       Align = alRight
       Caption = 'Remover Formata'#231#227'o'
       Font.Charset = DEFAULT_CHARSET
@@ -80,12 +82,13 @@ object frPrincipal: TfrPrincipal
       ParentFont = False
       TabOrder = 0
       OnClick = btnRemoverFormatacaoClick
+      ExplicitHeight = 68
     end
     object btnFormatar: TButton
       Left = 1
       Top = 1
       Width = 390
-      Height = 69
+      Height = 45
       Align = alLeft
       Caption = 'Transformar e Copiar'
       Font.Charset = DEFAULT_CHARSET
@@ -96,6 +99,7 @@ object frPrincipal: TfrPrincipal
       ParentFont = False
       TabOrder = 1
       OnClick = btnFormatarClick
+      ExplicitHeight = 48
     end
   end
   object pnlQuery: TPanel
